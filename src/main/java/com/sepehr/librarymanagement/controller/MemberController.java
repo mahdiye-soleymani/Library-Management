@@ -1,6 +1,7 @@
 package com.sepehr.librarymanagement.controller;
 
 import com.sepehr.librarymanagement.dto.MemberDTO;
+import com.sepehr.librarymanagement.entity.BorrowedBook;
 import com.sepehr.librarymanagement.entity.Member;
 import com.sepehr.librarymanagement.exception.BorrowLimitExceededException;
 import com.sepehr.librarymanagement.exception.InactiveMemberException;
@@ -71,29 +72,26 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{memberId}/borrow/{bookId}")
-    public ResponseEntity<Member> borrowBook(@PathVariable Long memberId, @PathVariable Long bookId) {
+    @PostMapping("/{memberId}/borrow")
+    public ResponseEntity<BorrowedBook> borrowBook(@PathVariable Long memberId, @RequestBody Long bookId) {
         try {
-            Member borrowedMember = memberService.borrowBook(memberId, bookId);
-            return ResponseEntity.ok(borrowedMember);
-        } catch (BorrowLimitExceededException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } catch (InactiveMemberException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            BorrowedBook borrowedBook = memberService.borrowBook(memberId, bookId);
+            return new ResponseEntity<>(borrowedBook, HttpStatus.OK);
+        } catch (BorrowLimitExceededException | InactiveMemberException | NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping("/{memberId}/return/{bookId}")
-    public ResponseEntity<Void> returnBook(@PathVariable Long memberId, @PathVariable Long bookId) {
+    @PostMapping("/return/{borrowedBookId}")
+    public ResponseEntity<Void> returnBook(@PathVariable Long borrowedBookId) {
         try {
-            memberService.returnBook(memberId, bookId);
-            return ResponseEntity.ok().build();
+            memberService.returnBook(borrowedBookId);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @GetMapping("/search")
     public ResponseEntity<List<Member>> searchMembers(@RequestParam(required = false) String firstName,

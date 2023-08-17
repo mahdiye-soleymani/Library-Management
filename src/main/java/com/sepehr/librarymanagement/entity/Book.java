@@ -36,11 +36,11 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookAuthorTranslator> bookAuthorTranslators;
 
-
     @ManyToOne
     @JoinColumn(name = "borrower_id")
     private Member borrower;
 
-
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<BorrowedBook> borrowedBooks;
 
 }

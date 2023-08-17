@@ -2,11 +2,12 @@ package com.sepehr.librarymanagement.service.impl;
 
 
 import com.sepehr.librarymanagement.entity.Book;
+import com.sepehr.librarymanagement.entity.BorrowedBook;
 import com.sepehr.librarymanagement.entity.Member;
 import com.sepehr.librarymanagement.exception.BorrowLimitExceededException;
 import com.sepehr.librarymanagement.exception.InactiveMemberException;
 import com.sepehr.librarymanagement.exception.NotFoundException;
-import com.sepehr.librarymanagement.repository.BookRepository;
+import com.sepehr.librarymanagement.repository.BorrowedBookRepository;
 import com.sepehr.librarymanagement.repository.MemberRepository;
 import com.sepehr.librarymanagement.service.BookService;
 import com.sepehr.librarymanagement.service.MemberService;
@@ -20,12 +21,14 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final BookService bookService;
-    private final BookRepository bookRepository;
 
-    public MemberServiceImpl(MemberRepository memberRepository, BookService bookService, BookRepository bookRepository) {
+    private final BorrowedBookRepository borrowedBookRepository;
+
+    public MemberServiceImpl(MemberRepository memberRepository, BookService bookService, BorrowedBookRepository borrowedBookRepository) {
         this.memberRepository = memberRepository;
         this.bookService = bookService;
-        this.bookRepository = bookRepository;
+
+        this.borrowedBookRepository = borrowedBookRepository;
     }
 
     @Override
@@ -58,18 +61,24 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member borrowBook(Long memberId, Long bookId) throws BorrowLimitExceededException {
+    public BorrowedBook borrowBook(Long memberId, Long bookId) throws BorrowLimitExceededException {
         Member member = memberRepository.findById(memberId).orElse(null);
         Book book = bookService.getBookById(bookId);
 
         if (member != null && book != null) {
             if (member.getIsActive()) {
                 if (member.getBorrowedBooks().size() < 2 && bookService.isBookAvailableForBorrow(bookId)) {
-                    member.getBorrowedBooks().add(book);
-                    book.setBorrower(member);
+                    BorrowedBook borrowedBook = new BorrowedBook();
+                    borrowedBook.setMember(member);
+                    borrowedBook.setBook(book);
+                    borrowedBook.setBorrowDate(LocalDate.now());
+                    borrowedBookRepository.save(borrowedBook);
+
+                    member.getBorrowedBooks().add(borrowedBook);
                     memberRepository.save(member);
-                    bookRepository.save(book);
-                    return member;
+
+                    bookService.setBookBorrower(bookId, member);
+                    return borrowedBook;
                 } else {
                     throw new BorrowLimitExceededException("The member has reached the borrowing limit or the book is not available.");
                 }
@@ -82,23 +91,25 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void returnBook(Long memberId, Long bookId) {
-        Member member = memberRepository.findById(memberId).orElse(null);
-        Book book = bookService.getBookById(bookId);
+    public void returnBook(Long borrowedBookId) {
+        BorrowedBook borrowedBook = borrowedBookRepository.findById(borrowedBookId).orElse(null);
 
-        if (member != null && book != null && book.getBorrower() != null) {
-            if (member.getBorrowedBooks().contains(book)) {
-                member.getBorrowedBooks().remove(book);
-                book.setBorrower(null);
-                memberRepository.save(member);
-                bookRepository.save(book);
-            } else {
-                throw new NotFoundException("The book is not borrowed by the member.");
-            }
+        if (borrowedBook != null) {
+            Member member = borrowedBook.getMember();
+            Book book = borrowedBook.getBook();
+
+            borrowedBook.setReturnDate(LocalDate.now());
+            borrowedBookRepository.save(borrowedBook);
+
+            member.getBorrowedBooks().remove(borrowedBook);
+            memberRepository.save(member);
+
+            bookService.setBookBorrower(book.getId(), null);
         } else {
-            throw new NotFoundException("Member or book not found.");
+            throw new NotFoundException("Borrowed book not found.");
         }
     }
+
 
     @Override
     public List<Member> searchMembersByFirstName(String firstName) {

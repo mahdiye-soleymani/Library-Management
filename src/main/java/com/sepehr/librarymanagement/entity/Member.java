@@ -45,13 +45,7 @@ public class Member {
     @Column(name = "is_active")
     private Boolean isActive;
 
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "member_borrowed_books",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private List<Book> borrowedBooks = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<BorrowedBook> borrowedBooks = new ArrayList<>();
 
 }

@@ -1,5 +1,6 @@
 package com.sepehr.librarymanagement.service;
 
+import com.sepehr.librarymanagement.entity.BorrowedBook;
 import com.sepehr.librarymanagement.entity.Member;
 import com.sepehr.librarymanagement.exception.BorrowLimitExceededException;
 
@@ -17,9 +18,9 @@ public interface MemberService {
 
     void deleteMember(Long id);
 
-    Member borrowBook(Long memberId, Long bookId) throws BorrowLimitExceededException;
+    BorrowedBook borrowBook(Long memberId, Long bookId) throws BorrowLimitExceededException;
 
-    void returnBook(Long memberId, Long bookId);
+    void returnBook(Long borrowedBookId);
 
     List<Member> searchMembersByFirstName(String firstName);
 

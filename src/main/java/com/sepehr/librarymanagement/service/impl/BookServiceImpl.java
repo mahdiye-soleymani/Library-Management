@@ -2,7 +2,9 @@ package com.sepehr.librarymanagement.service.impl;
 
 
 import com.sepehr.librarymanagement.entity.Book;
+import com.sepehr.librarymanagement.entity.Member;
 import com.sepehr.librarymanagement.enums.SearchType;
+import com.sepehr.librarymanagement.exception.NotFoundException;
 import com.sepehr.librarymanagement.repository.BookRepository;
 import com.sepehr.librarymanagement.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,18 @@ public class BookServiceImpl implements BookService {
     public boolean isBookAvailableForBorrow(Long bookId) {
         Book book = bookRepository.findById(bookId).orElse(null);
         return book != null && book.getBorrower() == null;
+    }
 
+
+    @Override
+    public void setBookBorrower(Long bookId, Member borrower) {
+        Book book = bookRepository.findById(bookId).orElse(null);
+        if (book != null) {
+            book.setBorrower(borrower);
+            bookRepository.save(book);
+        } else {
+            throw new NotFoundException("Book not found.");
+        }
     }
 
     @Override
