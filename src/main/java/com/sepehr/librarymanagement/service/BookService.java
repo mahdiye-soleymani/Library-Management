@@ -1,6 +1,7 @@
 package com.sepehr.librarymanagement.service;
 
 import com.sepehr.librarymanagement.entity.Book;
+import com.sepehr.librarymanagement.enums.SearchType;
 
 import java.util.List;
 
@@ -16,4 +17,7 @@ public interface BookService {
     void deleteBook(Long id);
 
     boolean isBookAvailableForBorrow(Long bookId);
+
+    Book searchByNameAndType(String name, SearchType searchType);
+
 }

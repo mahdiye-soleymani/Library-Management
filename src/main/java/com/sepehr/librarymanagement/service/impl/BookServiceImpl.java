@@ -2,6 +2,7 @@ package com.sepehr.librarymanagement.service.impl;
 
 
 import com.sepehr.librarymanagement.entity.Book;
+import com.sepehr.librarymanagement.enums.SearchType;
 import com.sepehr.librarymanagement.repository.BookRepository;
 import com.sepehr.librarymanagement.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,4 +50,20 @@ public class BookServiceImpl implements BookService {
         return book != null && book.getBorrower() == null;
 
     }
+
+    @Override
+    public Book searchByNameAndType(String name, SearchType searchType) {
+
+        switch (searchType) {
+            case TITLE:
+                return bookRepository.findByTitle(name);
+            case AUTHOR:
+                return bookRepository.findByAuthorsFirstNameContainingOrAuthorsLastNameContaining(name, name);
+            case TRANSLATOR:
+                return bookRepository.findByTranslatorsFirstNameContainingOrTranslatorsLastNameContaining(name, name);
+            default:
+                return null;
+        }
+    }
+
 }

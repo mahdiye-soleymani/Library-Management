@@ -2,6 +2,7 @@ package com.sepehr.librarymanagement.controller;
 
 import com.sepehr.librarymanagement.dto.BookDTO;
 import com.sepehr.librarymanagement.entity.Book;
+import com.sepehr.librarymanagement.enums.SearchType;
 import com.sepehr.librarymanagement.mapper.EntityDTOMapper;
 import com.sepehr.librarymanagement.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,20 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Book> searchBooks(@RequestParam String name, @RequestParam SearchType searchType) {
+        if (name == null || searchType == null) {
+            return ResponseEntity.badRequest().body(null); // یا هر پیام دلخواه
+        }
+
+        Book foundBook = bookService.searchByNameAndType(name, searchType);
+        if (foundBook != null) {
+            return ResponseEntity.ok(foundBook);
+        } else {
+            return ResponseEntity.notFound().build(); // یا هر پیام دلخواه
+        }
     }
 
 
