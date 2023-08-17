@@ -39,7 +39,6 @@ public class AuthorTranslatorController {
     @PostMapping
     public ResponseEntity<AuthorTranslator> createAuthorTranslator(@RequestBody AuthorTranslatorDTO authorTranslatorDTO) {
         AuthorTranslator authorTranslator = new AuthorTranslator();
-        // Set properties from DTO to the authorTranslator object
         authorTranslator.setName(authorTranslatorDTO.getName());
         authorTranslator.setType(authorTranslatorDTO.getType());
 
@@ -51,7 +50,6 @@ public class AuthorTranslatorController {
     public ResponseEntity<AuthorTranslator> updateAuthorTranslator(@PathVariable Long id, @RequestBody AuthorTranslatorDTO authorTranslatorDTO) {
         AuthorTranslator existingAuthorTranslator = authorTranslatorService.getAuthorTranslatorById(id);
         if (existingAuthorTranslator != null) {
-            // Update properties from DTO to the existingAuthorTranslator object
             existingAuthorTranslator.setName(authorTranslatorDTO.getName());
             existingAuthorTranslator.setType(authorTranslatorDTO.getType());
 

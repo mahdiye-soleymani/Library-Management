@@ -97,15 +97,12 @@ public class MemberController {
     public ResponseEntity<List<Member>> searchMembers(@RequestParam(required = false) String firstName,
                                                       @RequestParam(required = false) String lastName) {
         if (firstName != null && lastName != null) {
-            // Search by both first name and last name
             List<Member> members = memberService.searchMembersByFirstNameAndLastName(firstName, lastName);
             return ResponseEntity.ok(members);
         } else if (firstName != null) {
-            // Search by first name
             List<Member> members = memberService.searchMembersByFirstName(firstName);
             return ResponseEntity.ok(members);
         } else if (lastName != null) {
-            // Search by last name
             List<Member> members = memberService.searchMembersByLastName(lastName);
             return ResponseEntity.ok(members);
         } else {

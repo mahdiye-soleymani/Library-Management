@@ -73,14 +73,14 @@ public class BookController {
     @GetMapping("/search")
     public ResponseEntity<Book> searchBooks(@RequestParam String name, @RequestParam SearchType searchType) {
         if (name == null || searchType == null) {
-            return ResponseEntity.badRequest().body(null); // یا هر پیام دلخواه
+            return ResponseEntity.badRequest().body(null);
         }
 
         Book foundBook = bookService.searchByNameAndType(name, searchType);
         if (foundBook != null) {
             return ResponseEntity.ok(foundBook);
         } else {
-            return ResponseEntity.notFound().build(); // یا هر پیام دلخواه
+            return ResponseEntity.notFound().build();
         }
     }
 
