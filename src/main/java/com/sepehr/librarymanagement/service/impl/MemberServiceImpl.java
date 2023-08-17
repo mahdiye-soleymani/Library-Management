@@ -12,6 +12,7 @@ import com.sepehr.librarymanagement.service.BookService;
 import com.sepehr.librarymanagement.service.MemberService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -99,4 +100,23 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    @Override
+    public List<Member> searchMembersByFirstName(String firstName) {
+        return memberRepository.findByFirstName(firstName);
+    }
+
+    @Override
+    public List<Member> searchMembersByLastName(String lastName) {
+        return memberRepository.findByLastName(lastName);
+    }
+
+    @Override
+    public List<Member> searchMembersByFirstNameAndLastName(String firstName, String lastName) {
+        return memberRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @Override
+    public List<Member> searchMembersByMembershipDate(LocalDate membershipDate) {
+        return memberRepository.findByMembershipDate(membershipDate);
+    }
 }
