@@ -28,6 +28,15 @@ eureka:
 report:
   location: C:\\Reports\\Monthly\\
 
+keycloak:
+  auth-server-url: http://localhost:8083/auth
+  realm: library-realm
+  resource: library-client
+  public-client: true
+  credentials:
+    secret: library-client-secret
+
+
 ---
 spring:
   config:
